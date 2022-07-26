@@ -4,15 +4,13 @@
 # Author: lhy<lhy_in_blcu@126.com,https://huangyong.github.io>
 # Date: 18-10-5
 
-from py2neo import Graph
+# from py2neo import Graph
+from redisgraph import Graph
 
 class AnswerSearcher:
     def __init__(self):
         self.g = Graph(
-            host="127.0.0.1",
-            http_port=7474,
-            user="lhy",
-            password="lhy123")
+            name="test")
         self.num_limit = 20
 
     '''执行cypher查询，并返回相应结果'''
@@ -23,7 +21,7 @@ class AnswerSearcher:
             queries = sql_['sql']
             answers = []
             for query in queries:
-                ress = self.g.run(query).data()
+                ress = self.g.query(query).result_set
                 answers += ress
             final_answer = self.answer_prettify(question_type, answers)
             if final_answer:

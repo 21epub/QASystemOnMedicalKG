@@ -6,17 +6,14 @@
 
 import os
 import json
-from py2neo import Graph,Node
+# from py2neo import Graph,Node
+from redisgraph import Graph, Node
 
 class MedicalGraph:
     def __init__(self):
         cur_dir = '/'.join(os.path.abspath(__file__).split('/')[:-1])
         self.data_path = os.path.join(cur_dir, 'data/medical.json')
-        self.g = Graph(
-            host="127.0.0.1",  # neo4j 搭载服务器的ip地址，ifconfig可获取到
-            http_port=7474,  # neo4j 服务器监听的端口号
-            user="lhy",  # 数据库user name，如果没有更改过，应该是neo4j
-            password="lhy123")
+        self.g = Graph("test")
 
     '''读取文件'''
     def read_nodes(self):
@@ -159,8 +156,9 @@ class MedicalGraph:
     def create_node(self, label, nodes):
         count = 0
         for node_name in nodes:
-            node = Node(label, name=node_name)
-            self.g.create(node)
+            node = Node(label=label, properties={"name": node_name})
+            self.g.add_node(node)
+            self.g.commit()
             count += 1
             print(count, len(nodes))
         return
@@ -169,12 +167,20 @@ class MedicalGraph:
     def create_diseases_nodes(self, disease_infos):
         count = 0
         for disease_dict in disease_infos:
-            node = Node("Disease", name=disease_dict['name'], desc=disease_dict['desc'],
-                        prevent=disease_dict['prevent'] ,cause=disease_dict['cause'],
-                        easy_get=disease_dict['easy_get'],cure_lasttime=disease_dict['cure_lasttime'],
-                        cure_department=disease_dict['cure_department']
-                        ,cure_way=disease_dict['cure_way'] , cured_prob=disease_dict['cured_prob'])
-            self.g.create(node)
+            node = Node(label="Disease", properties={'name': disease_dict['name'], 'desc': disease_dict['desc'],
+                                                     'prevent': disease_dict['prevent'], 'cause': disease_dict['cause'],
+                                                     'easy_get': disease_dict['easy_get'],
+                                                     'cure_lasttime': disease_dict['cure_lasttime'],
+                                                     'cure_department': disease_dict['cure_department'],
+                                                     'cure_way': disease_dict['cure_way'],
+                                                     'cured_prob': disease_dict['cured_prob']})
+            # node = Node("Disease", name=disease_dict['name'], desc=disease_dict['desc'],
+            #             prevent=disease_dict['prevent'] ,cause=disease_dict['cause'],
+            #             easy_get=disease_dict['easy_get'],cure_lasttime=disease_dict['cure_lasttime'],
+            #             cure_department=disease_dict['cure_department']
+            #             ,cure_way=disease_dict['cure_way'] , cured_prob=disease_dict['cured_prob'])
+            self.g.add_node(node)
+            self.g.commit()
             count += 1
             print(count)
         return
@@ -227,7 +233,7 @@ class MedicalGraph:
             query = "match(p:%s),(q:%s) where p.name='%s'and q.name='%s' create (p)-[rel:%s{name:'%s'}]->(q)" % (
                 start_node, end_node, p, q, rel_type, rel_name)
             try:
-                self.g.run(query)
+                self.g.query(query)
                 count += 1
                 print(rel_type, count, all)
             except Exception as e:
