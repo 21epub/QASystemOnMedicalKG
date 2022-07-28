@@ -47,6 +47,8 @@ class MedicalGraph:
         for data in open(self.data_path):
             disease_dict = {}
             count += 1
+            if count == 10:
+                break
             print(count)
             data_json = json.loads(data)
             disease = data_json['name']
@@ -234,6 +236,7 @@ class MedicalGraph:
                 start_node, end_node, p, q, rel_type, rel_name)
             try:
                 self.g.query(query)
+                print(query)
                 count += 1
                 print(rel_type, count, all)
             except Exception as e:
