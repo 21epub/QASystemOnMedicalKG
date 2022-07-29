@@ -10,7 +10,7 @@ from redisgraph import Graph
 class AnswerSearcher:
     def __init__(self):
         self.g = Graph(
-            name="test")
+            name="Medical")
         self.num_limit = 20
 
     '''执行cypher查询，并返回相应结果'''

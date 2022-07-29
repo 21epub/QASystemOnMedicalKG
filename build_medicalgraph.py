@@ -13,7 +13,7 @@ class MedicalGraph:
     def __init__(self):
         cur_dir = '/'.join(os.path.abspath(__file__).split('/')[:-1])
         self.data_path = os.path.join(cur_dir, 'data/medical.json')
-        self.g = Graph("test")
+        self.g = Graph("Medical")
 
     '''读取文件'''
     def read_nodes(self):
@@ -47,9 +47,6 @@ class MedicalGraph:
         for data in open(self.data_path):
             disease_dict = {}
             count += 1
-            if count == 10:
-                break
-            print(count)
             data_json = json.loads(data)
             disease = data_json['name']
             disease_dict['name'] = disease
@@ -160,9 +157,9 @@ class MedicalGraph:
         for node_name in nodes:
             node = Node(label=label, properties={"name": node_name})
             self.g.add_node(node)
-            self.g.commit()
             count += 1
-            print(count, len(nodes))
+            print(label, node_name,  count, len(nodes))
+        self.g.flush()
         return
 
     '''创建知识图谱中心疾病的节点'''
@@ -182,9 +179,9 @@ class MedicalGraph:
             #             cure_department=disease_dict['cure_department']
             #             ,cure_way=disease_dict['cure_way'] , cured_prob=disease_dict['cured_prob'])
             self.g.add_node(node)
-            self.g.commit()
             count += 1
-            print(count)
+            print(count, " Disease:", disease_dict['name'])
+        self.g.flush()
         return
 
     '''创建知识图谱实体节点类型schema'''
